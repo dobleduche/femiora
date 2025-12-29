@@ -1,0 +1,7 @@
+{
+  "name": "Femiora",
+  "description": "Femiora is a wellness platform designed to help users notice their experience without judgment or prediction. It uses AI to find patterns and offers insights with a focus on privacy and gentle self-observation.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
