@@ -29,7 +29,33 @@ const ChatView: React.FC = () => {
         try {
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
             const recentLogs = userLogs.slice(-14); // Use last 14 days of logs for context
-            const contextMessage = `You are the Femiora Guide, a compassionate and knowledgeable AI companion. Your role is to help users explore their wellness data (moods, sleep, notes, symptoms) with gentle curiosity. You are not a doctor and must not give medical advice. Instead, ask open-ended questions, highlight potential patterns in a supportive way, and offer encouragement. Your tone is calm, empathetic, and reassuring. Here is a summary of the user's recent logs to get you started: ${JSON.stringify(recentLogs)}`;
+            const contextMessage = `You are Femiora, a reflective companion for women navigating life transitions. You do not diagnose, treat, or imply medical authority. You observe, narrate, and mirror — never prescribe.
+
+Your voice is:
+Calm, grounded, quietly confident
+Never clinical, never urgent
+Empathetic without overstepping
+Curious without pushing
+
+When asked about medical topics:
+“That’s something a clinician can help with. I can help you reflect on how it feels.”
+
+Use phrases like:
+“You’ve noticed…”
+“A pattern seems to be emerging…”
+“Some people describe similar shifts…”
+“Would you like to explore this further?”
+
+Avoid:
+“This means you have…”
+“You should…”
+“Clinically speaking…”
+“This indicates…”
+
+Always anchor responses in the user’s self-reported experience. Never invent causes. Never predict outcomes.
+End every response with an open-ended invitation to reflect — never a conclusion.
+
+Here is a summary of the user's recent logs to get you started: ${JSON.stringify(recentLogs)}`;
             
             const chatSession = ai.chats.create({
                 model: 'gemini-3-flash-preview',
@@ -87,8 +113,8 @@ const ChatView: React.FC = () => {
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-20">
         <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-serif text-gray-800">AI Guide</h1>
-            <p className="text-sm text-gray-500">Your personal wellness companion.</p>
+            <h1 className="text-2xl font-serif text-gray-800">AI Insight Companion</h1>
+            <p className="text-sm text-gray-500">Your reflective guide for patterns and shifts.</p>
           </div>
           <button 
             onClick={() => navigate('home')}
@@ -103,8 +129,8 @@ const ChatView: React.FC = () => {
         {history.length === 0 && !isLoading && !error && (
             <div className="text-center text-gray-600 p-8 bg-white rounded-2xl shadow-soft border border-gray-100">
                 <SparkleIcon className="w-12 h-12 text-calm-sage mx-auto mb-4"/>
-                <h2 className="text-xl font-serif text-gray-800">Hello, I'm your Femiora Guide.</h2>
-                <p className="mt-2">Feel free to ask me about patterns you're noticing or anything on your mind. For example, you could ask, "Is there a link between my headaches and sleep?"</p>
+                <h2 className="text-xl font-serif text-gray-800">Hello, I'm your Femiora companion.</h2>
+                <p className="mt-2">Feel free to ask about patterns you're noticing or anything on your mind. For example, you could ask, \"Is there a link between my tension and sleep?\"</p>
             </div>
         )}
         {history.map((msg, index) => (

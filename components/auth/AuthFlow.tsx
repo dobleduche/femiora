@@ -31,13 +31,18 @@ const AuthFlow: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-paper-white to-dawn-pink flex flex-col justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-warm-sand to-calm-teal flex flex-col justify-center">
             <div className="max-w-sm mx-auto p-8 w-full">
                 <div className="text-center mb-8">
-                    <FeatherIcon className="w-16 h-16 text-calm-sage mx-auto animate-subtle-float" />
-                    <h1 className="text-3xl font-serif text-gray-800 mt-4">Welcome to Femiora</h1>
-                    <p className="text-gray-600 mt-2">
-                        Enter your email to begin or continue your journey.
+                    <FeatherIcon className="w-16 h-16 text-calm-sage mx-auto" />
+                    <h1 className="text-3xl font-serif text-gray-800 mt-4">
+                        Your body isn’t breaking. It’s changing.
+                    </h1>
+                    <p className="text-gray-700 mt-3">
+                        Femiora helps you notice the patterns — without fear, without shame, without labels.
+                    </p>
+                    <p className="text-sm text-gray-600 mt-3">
+                        Enter your email to start reflecting.
                     </p>
                 </div>
 
@@ -68,7 +73,7 @@ const AuthFlow: React.FC = () => {
                                    shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mist-blue
                                    disabled:bg-gray-400 disabled:shadow-none disabled:transform-none disabled:cursor-not-allowed"
                     >
-                        {loading ? 'Sending...' : 'Continue with Email'}
+                        {loading ? 'Sending...' : 'Start Reflecting →'}
                     </button>
                 </form>
 

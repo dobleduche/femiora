@@ -51,16 +51,16 @@ const ClinicianSummaryView: React.FC = () => {
       
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: `You are a clinical data analyst. Your task is to synthesize the following user-logged wellness data into a clear, objective, and concise summary for a healthcare professional.
+        contents: `You are a reflective summary writer. Your task is to synthesize the following user-logged wellness data into a clear, objective, and concise summary that can be used for personal reflection or shared with a trusted support person.
 
         **Instructions:**
-        1.  **Do NOT provide medical advice, diagnoses, or treatment recommendations.**
+        1.  **Do NOT diagnose or treat. Keep it observational and neutral.**
         2.  Present the information factually and neutrally using Markdown formatting.
         3.  Use clear headings (e.g., \`## Section Title\`).
         4.  Begin with a brief overview including the date range covered and the total number of entries analyzed.
         5.  Create a "Sensation Frequency" section, listing the most frequently reported sensations and their counts.
         6.  Create a "Mood & Sleep Patterns" section, summarizing common moods and the average reported sleep quality (on a scale of 1-5).
-        7.  Create a "Noted Correlations" section, highlighting any potential connections observed in the data (e.g., "Headaches were often noted on days with reported sleep quality below 3/5.").
+        7.  Create a "Noted Connections" section, highlighting any potential connections observed in the data (e.g., "Tension was often noted on days with reported sleep quality below 3/5.").
         8.  Keep the entire summary concise and easy to read.
 
         **User Data:**
@@ -79,10 +79,10 @@ const ClinicianSummaryView: React.FC = () => {
 
   const handlePrint = () => {
     const printWindow = window.open('', '', 'height=600,width=800');
-    printWindow?.document.write('<html><head><title>Femiora Clinician Summary</title>');
+    printWindow?.document.write('<html><head><title>Femiora Support Summary</title>');
     printWindow?.document.write('<style>body{font-family:sans-serif;line-height:1.5;} h2{font-size:1.25rem;border-bottom:1px solid #eee;padding-bottom:0.5rem;margin-top:1.5rem;} ul{padding-left:1.25rem;} strong{font-weight:600;}</style>');
     printWindow?.document.write('</head><body>');
-    printWindow?.document.write(`<h1>Femiora Clinician Summary</h1>`);
+    printWindow?.document.write(`<h1>Femiora Support Summary</h1>`);
     printWindow?.document.write(summary?.replace(/## (.*)/g, '<h2>$1</h2>') || '');
     printWindow?.document.write('</body></html>');
     printWindow?.document.close();
@@ -103,8 +103,8 @@ const ClinicianSummaryView: React.FC = () => {
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-20">
         <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-serif text-gray-800">Clinician Summary</h1>
-            <p className="text-sm text-gray-500">A report of your observations.</p>
+            <h1 className="text-2xl font-serif text-gray-800">Support Summary</h1>
+            <p className="text-sm text-gray-500">A shareable reflection of your observations.</p>
           </div>
           <button 
             onClick={() => navigate('home')}

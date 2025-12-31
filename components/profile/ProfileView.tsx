@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { HomeIcon, CheckIcon, Edit2Icon, PlusIcon, TrashIcon, SparkleIcon, LogOutIcon, TrendingUpIcon, DropletIcon, MoonIcon, TagIcon } from '../icons/Icons';
+import { HomeIcon, CheckIcon, Edit2Icon, PlusIcon, TrashIcon, SparkleIcon, LogOutIcon, TrendingUpIcon, DropletIcon, MoonIcon, TagIcon, FeatherIcon, LockIcon, LeafIcon } from '../icons/Icons';
 import SegmentedControl from '../ui/SegmentedControl';
 import ToggleSwitch from '../ui/ToggleSwitch';
 import type { UserProfile, Tier, View, Theme, UserSettings } from '../../services/api';
@@ -9,10 +9,15 @@ import { useApp } from '../../contexts/AppContext';
 import { useEntitlements, EntitlementGuard } from '../../contexts/EntitlementContext';
 
 const focusOptions = [
-    { id: 'mood', label: 'Mood & Energy', icon: <TrendingUpIcon className="w-8 h-8" /> },
-    { id: 'cycle', label: 'Cycle Patterns', icon: <DropletIcon className="w-8 h-8" /> },
-    { id: 'sleep', label: 'Sleep Quality', icon: <MoonIcon className="w-8 h-8" /> },
-    { id: 'sensations', label: 'Sensation Trends', icon: <TagIcon className="w-8 h-8" /> },
+    { id: 'energy', label: 'Energy levels throughout the day', icon: <TrendingUpIcon className="w-8 h-8" /> },
+    { id: 'mood', label: 'Mood tone — light, heavy, calm, tense', icon: <FeatherIcon className="w-8 h-8" /> },
+    { id: 'sleep', label: 'Sleep quality and restfulness', icon: <MoonIcon className="w-8 h-8" /> },
+    { id: 'focus', label: 'Focus and mental clarity', icon: <SparkleIcon className="w-8 h-8" /> },
+    { id: 'temperature', label: 'Body temperature sensations', icon: <TagIcon className="w-8 h-8" /> },
+    { id: 'stress', label: 'Stress pressure or ease', icon: <LockIcon className="w-8 h-8" /> },
+    { id: 'motivation', label: 'Motivation — what moves you?', icon: <LeafIcon className="w-8 h-8" /> },
+    { id: 'appetite', label: 'Appetite shifts', icon: <TagIcon className="w-8 h-8" /> },
+    { id: 'cycles', label: 'Personal cadence', icon: <DropletIcon className="w-8 h-8" /> },
 ];
 
 const ProfileView: React.FC = () => {

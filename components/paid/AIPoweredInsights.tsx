@@ -46,7 +46,7 @@ const AIPoweredInsights: React.FC = () => {
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: `You are a wellness pattern analyst for Femiora. Your role is to be educational, pattern-based, and reflective.
-        **CRITICAL: Do NOT provide medical advice, diagnosis, or treatment recommendations.**
+        **CRITICAL: Do NOT diagnose or treat. Keep insights observational and gentle.**
         Analyze the following user data from the last 7 days and generate two concise, gentle insights about potential connections or patterns. Frame them as observations for the user to consider, not as definitive statements.
         At the end of your description for each insight, add a sentence like "Your feedback on these insights helps me learn what's most helpful for you."
         Data:\n${userDataString}`,

@@ -48,7 +48,7 @@ const TrendsView: React.FC = () => {
             const response = await ai.models.generateContent({
                 model: "gemini-3-flash-preview",
                 contents: `You are a data analyst for Femiora. Your goal is to analyze the user's wellness data based on their question and provide a gentle, insightful summary and optional chart data.
-                - **NEVER give medical advice.**
+                - **Do not diagnose or treat; keep it observational and reflective.**
                 - Analyze the full dataset provided.
                 - Respond in the specified JSON format.
                 - For chart data, provide appropriate labels and datasets. For time-based queries, labels should be dates or months. For comparisons, labels should be the categories being compared.
