@@ -47,7 +47,7 @@ const DeepInsightCard: React.FC = () => {
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: `You are a wellness data analyst for Femiora. Your goal is to find one unique, non-obvious, and potentially meaningful correlation or pattern from the user's entire history. This is a special "Deep Insight".
-        **CRITICAL: Do NOT give medical advice. Frame it as a gentle observation.**
+        **CRITICAL: Do NOT diagnose or treat. Frame it as a gentle observation.**
         Analyze the full dataset provided.
         Respond in the specified JSON format.
         The title should be short and intriguing (e.g., "A Surprising Link", "Your Weekend Pattern").

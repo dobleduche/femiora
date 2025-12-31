@@ -15,7 +15,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({ onClose, onUpgrade }) => {
   const coreFeatures = [
     "See your full history & long-term patterns",
     "Receive weekly AI summaries for reflection",
-    "Discover potential symptom & energy correlations",
+    "Discover potential energy & sensation correlations",
     "Secure cloud sync across all devices",
     "Data export in multiple formats",
     "Priority feature requests",
@@ -24,7 +24,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({ onClose, onUpgrade }) => {
   
   const premiumFeatures = [
     "Everything in Core, plus:",
-    "Generate summaries for healthcare visits",
+    "Generate shareable summaries for reflections",
     "Share your journey with a trusted partner",
     "Ask questions with Advanced AI Trend Analysis",
     "Personalize your journaling with custom prompts",
@@ -110,7 +110,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({ onClose, onUpgrade }) => {
                   <span className="text-lg text-gray-600">/month</span>
                 </div>
                 <div className="text-xs md:text-sm text-gray-600 mt-1">
-                  {selectedTier === 'core' ? 'Less than a therapy co-pay' : 'Less than two specialty coffees'}
+                  {selectedTier === 'core' ? 'Less than a weekly wellness class' : 'Less than two specialty coffees'}
                 </div>
               </div>
               <div className="text-right">

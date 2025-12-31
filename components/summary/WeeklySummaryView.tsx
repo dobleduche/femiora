@@ -39,7 +39,7 @@ const WeeklySummaryView: React.FC = () => {
         model: 'gemini-3-flash-preview',
         contents: `You are the Femiora Guide. Analyze the user's wellness data from the last 7 days and create a gentle, reflective summary in Markdown format.
         **HARD GUARDRAILS:**
-        - **NEVER give medical advice, diagnoses, or treatment recommendations.**
+        - **Do not diagnose or treat; keep it observational and reflective.**
         - **NEVER be prescriptive.** Frame everything as an observation for the user to interpret.
 
         **Instructions:**

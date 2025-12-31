@@ -8,7 +8,7 @@ const ValueComparison: React.FC = () => {
 
   const comparisons = [
     {
-      item: "Weekly therapy co-pay",
+      item: "Weekly wellness class",
       cost: "$30",
       femiora: "1 month of Premium",
       saving: "Save $8"

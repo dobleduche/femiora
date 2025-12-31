@@ -18,6 +18,7 @@ export type UserSettings = {
   reminderTime: string;
   customPrompts: string[];
   focusAreas: string[];
+  onboardingIntent: string;
 };
 
 export type PartnerAccess = {
@@ -31,7 +32,7 @@ export const users = pgTable('users', {
     id: varchar('id', { length: 255 }).primaryKey(), // Supabase auth user ID
     tier: tierEnum('tier').default('free').notNull(),
     appState: appStateEnum('app_state').default('onboarding').notNull(),
-    settings: jsonb('settings').default({ name: 'User', theme: 'light', remindersEnabled: true, reminderTime: '08:00', customPrompts: [], focusAreas: [] }).$type<UserSettings>().notNull(),
+    settings: jsonb('settings').default({ name: 'User', theme: 'light', remindersEnabled: true, reminderTime: '08:00', customPrompts: [], focusAreas: [], onboardingIntent: '' }).$type<UserSettings>().notNull(),
     partnerAccess: jsonb('partner_access').default({ enabled: false, partnerEmail: null }).$type<PartnerAccess>().notNull(),
     currentStreak: integer('current_streak').default(0).notNull(),
     lastLogDate: varchar('last_log_date', { length: 10 }).default('').notNull(), // YYYY-MM-DD

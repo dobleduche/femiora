@@ -156,7 +156,7 @@ const PremiumDashboard: React.FC = () => {
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               <ToolCard icon={<MicIcon className="w-8 h-8 text-soft-clay" />} title="Live AI Coach" description="Talk with your guide in real-time for instant support." status="ready" actionText="Start Session" onAction={() => navigate('liveCoach')} />
-              <ToolCard icon="🏥" title="Clinician Summary" description="Generate a visit-ready report of your observations." status="ready" actionText="Create report" onAction={() => navigate('clinicianSummary')} />
+              <ToolCard icon="📝" title="Support Summary" description="Generate a shareable report of your observations." status="ready" actionText="Create report" onAction={() => navigate('clinicianSummary')} />
               <ToolCard 
                 icon={<UsersIcon className="w-8 h-8 text-soft-clay" />} 
                 title="Partner Access" 
