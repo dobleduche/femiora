@@ -23,7 +23,8 @@ app.use((
     error: message,
   });
 });
-const port = Number(process.env.PORT) || 3001;
+const envPort = parseInt(process.env.PORT ?? '', 10);
+const port = Number.isNaN(envPort) ? 3001 : envPort;
 
 if (process.env.NODE_ENV !== 'test') {
   app.listen(port, () => {
