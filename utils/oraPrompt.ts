@@ -32,4 +32,12 @@ const citationRules = `CITATION RULES
 - If sources are provided, end with a Sources section listing each source id and title.
 - If no sources are provided, say: “I can explain this in general terms, but I don’t have sourced references loaded right now—so I’ll keep it high-level.”`;
 
+/**
+ * Builds the complete Ora system prompt by combining the base prompt, lab addendum,
+ * citation rules, and a JSON summary of the user's recent logs.
+ *
+ * @param recentLogs - Arbitrary log data representing the user's recent activity,
+ * which will be JSON-stringified and appended to the prompt to provide context.
+ * @returns The full system prompt string to initialize the Ora assistant.
+ */
 export const buildOraSystemPrompt = (recentLogs: unknown): string => `${baseSystemPrompt}\n\n${labAddendum}\n\n${citationRules}\n\nHere is a summary of the user's recent logs to get you started:\n${JSON.stringify(recentLogs)}\n`;
