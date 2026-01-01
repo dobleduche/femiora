@@ -1,4 +1,3 @@
-
 import React, { useMemo, useEffect, useState } from 'react';
 import WelcomeFlow from './components/onboarding/WelcomeFlow';
 import FreeTierDashboard from './components/free/FreeTierDashboard';
@@ -22,7 +21,7 @@ import TrendsView from './components/trends/TrendsView';
 import WelcomeBack from './components/engagement/WelcomeBack';
 import AuthFlow from './components/auth/AuthFlow';
 import LoadingScreen from './components/ui/LoadingScreen';
-import type { DailyLog, Tier, View } from './services/api';
+import type { DailyLog, Tier } from './services/api';
 import { UserProvider, useUser } from './contexts/UserContext';
 import { AppProvider, useApp } from './contexts/AppContext';
 import { ProactiveUpgradeProvider } from './contexts/ProactiveUpgradeContext';
@@ -30,148 +29,180 @@ import { EntitlementProvider, useEntitlements } from './contexts/EntitlementCont
 import { supabase } from './lib/db';
 import type { Session } from '@supabase/supabase-js';
 
-
 export type { DailyLog };
 
-// This component handles all UI logic and consumes context. It receives no props.
+/**
+ * AppUI handles all UI logic and consumes context. It receives no props.
+ */
 const AppUI: React.FC = () => {
-    const { user, milestones, upgrade, markMilestoneAsCelebrated } = useUser();
-    const entitlements = useEntitlements();
-    const {
-        currentView,
-        isUpgradeModalOpen,
-        openUpgradeModal,
-        closeUpgradeModal,
-        isLogModalOpen,
-        isPartnerModalOpen,
-        welcomeBackMessage,
-        setWelcomeBackMessage,
-        clearWelcomeBackMessage,
-        navigate,
-    } = useApp();
-    
-    const [showPremiumUnlock, setShowPremiumUnlock] = useState(false);
-    
-    const uncelebratedMilestone = useMemo(() => milestones.find(m => !m.celebrated), [milestones]);
+  const { user, milestones, upgrade, markMilestoneAsCelebrated } = useUser();
+  const entitlements = useEntitlements();
 
-    useEffect(() => {
-        if (user.settings.theme === 'dark') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
+  const {
+    currentView,
+    isUpgradeModalOpen,
+    closeUpgradeModal,
+    isLogModalOpen,
+    isPartnerModalOpen,
+    welcomeBackMessage,
+    setWelcomeBackMessage,
+    clearWelcomeBackMessage,
+    navigate,
+  } = useApp();
+
+  const [showPremiumUnlock, setShowPremiumUnlock] = useState(false);
+
+  const uncelebratedMilestone = useMemo(
+    () => milestones.find((m) => !m.celebrated),
+    [milestones]
+  );
+
+  useEffect(() => {
+    if (user.settings.theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [user.settings.theme]);
+
+  useEffect(() => {
+    if (user.appState === 'dashboard' && user.lastLogDate) {
+      const today = new Date();
+      const lastLog = new Date(user.lastLogDate);
+      const diffTime = today.getTime() - lastLog.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays > 2) {
+        let message = `Welcome back, ${user.settings.name}. It's been a few days.`;
+        if (user.currentStreak > 1) {
+          message += ` Your ${user.currentStreak}-day streak ended, but a new journey begins today.`;
         }
-    }, [user.settings.theme]);
+        setWelcomeBackMessage(message);
+      }
+    }
+  }, [
+    user.appState,
+    user.lastLogDate,
+    user.currentStreak,
+    user.settings.name,
+    setWelcomeBackMessage,
+  ]);
 
-    useEffect(() => {
-        if (user.appState === 'dashboard' && user.lastLogDate) {
-            const today = new Date();
-            const lastLog = new Date(user.lastLogDate);
-            const diffTime = today.getTime() - lastLog.getTime();
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const handleUpgrade = async (tier: Tier) => {
+    await upgrade(tier);
+    closeUpgradeModal();
+    setShowPremiumUnlock(true);
 
-            if (diffDays > 2) {
-                let message = `Welcome back, ${user.settings.name}. It's been a few days.`;
-                if (user.currentStreak > 1) {
-                    message += ` Your ${user.currentStreak}-day streak ended, but a new journey begins today.`;
-                }
-                setWelcomeBackMessage(message);
-            }
-        }
-    }, [user.appState, user.lastLogDate, user.currentStreak, user.settings.name, setWelcomeBackMessage]);
-    
-    const handleUpgrade = async (tier: Tier) => {
-      await upgrade(tier);
-      closeUpgradeModal();
-      setShowPremiumUnlock(true);
-    };
-  
-    const renderContent = () => {
-        if (user.appState === 'onboarding') {
-            return <WelcomeFlow />;
-        }
+    // Optional: reduce “upgrade flicker” by forcing a quick re-route.
+    // If you don’t want navigation, remove these two lines.
+    // navigate('home');
+    // setTimeout(() => navigate('chat'), 50);
+  };
 
-        if (user.appState === 'dashboard') {
-            if (currentView === 'weeklySummary' && entitlements.canAccessWeeklySummary) return <WeeklySummaryView />;
-            if (currentView === 'liveCoach' && entitlements.canUseLiveCoach) return <LiveCoachView />;
-            if (currentView === 'trendsView' && entitlements.canUseAdvancedTrends) return <TrendsView />;
-            if (currentView === 'partnerView' && user.partnerAccess.enabled) return <PartnerView />;
-            if (currentView === 'clinicianSummary' && entitlements.canUseClinicianSummary) return <ClinicianSummaryView />;
-            if (currentView === 'chat') return entitlements.canAccessChat ? <ChatView /> : <UpgradeToChat />;
-            if (currentView === 'patterns') return <PatternsView />;
-            if (currentView === 'journal') return <JournalView />;
-            if (currentView === 'profile') return <ProfileView />;
-            
-            return entitlements.isFree
-                ? <FreeTierDashboard />
-                : <PremiumDashboard />;
-        }
-        return null;
-    };
+  const renderContent = () => {
+    if (user.appState === 'onboarding') return <WelcomeFlow />;
 
-    return (
-        <div className="relative min-h-screen">
-            {renderContent()}
-            {user.appState === 'dashboard' && currentView !== 'partnerView' && (
-                <div className="md:hidden">
-                    <PremiumNavbar />
-                </div>
-            )}
-            {isUpgradeModalOpen && <UpgradeModal onClose={closeUpgradeModal} onUpgrade={handleUpgrade} />}
-            {uncelebratedMilestone && <MilestoneCelebration milestone={uncelebratedMilestone} onClose={() => markMilestoneAsCelebrated(uncelebratedMilestone.id)} />}
-            {showPremiumUnlock && <PremiumUnlock onClose={() => setShowPremiumUnlock(false)} />}
-            {isLogModalOpen && <LogEntryModal />}
-            {isPartnerModalOpen && <PartnerAccessModal />}
-            {welcomeBackMessage && <WelcomeBack message={welcomeBackMessage} onDismiss={clearWelcomeBackMessage} />}
+    if (user.appState === 'dashboard') {
+      if (currentView === 'weeklySummary' && entitlements.canAccessWeeklySummary) return <WeeklySummaryView />;
+      if (currentView === 'liveCoach' && entitlements.canUseLiveCoach) return <LiveCoachView />;
+      if (currentView === 'trendsView' && entitlements.canUseAdvancedTrends) return <TrendsView />;
+      if (currentView === 'partnerView' && user.partnerAccess.enabled) return <PartnerView />;
+      if (currentView === 'clinicianSummary' && entitlements.canUseClinicianSummary) return <ClinicianSummaryView />;
+      if (currentView === 'chat') return entitlements.canAccessChat ? <ChatView /> : <UpgradeToChat />;
+      if (currentView === 'patterns') return <PatternsView />;
+      if (currentView === 'journal') return <JournalView />;
+      if (currentView === 'profile') return <ProfileView />;
+
+      return entitlements.isFree ? <FreeTierDashboard /> : <PremiumDashboard />;
+    }
+
+    return null;
+  };
+
+  return (
+    <div className="relative min-h-screen">
+      {renderContent()}
+
+      {user.appState === 'dashboard' && currentView !== 'partnerView' && (
+        <div className="md:hidden">
+          <PremiumNavbar />
         </div>
-    );
+      )}
+
+      {isUpgradeModalOpen && (
+        <UpgradeModal onClose={closeUpgradeModal} onUpgrade={handleUpgrade} />
+      )}
+
+      {uncelebratedMilestone && (
+        <MilestoneCelebration
+          milestone={uncelebratedMilestone}
+          onClose={() => markMilestoneAsCelebrated(uncelebratedMilestone.id)}
+        />
+      )}
+
+      {showPremiumUnlock && (
+        <PremiumUnlock onClose={() => setShowPremiumUnlock(false)} />
+      )}
+
+      {isLogModalOpen && <LogEntryModal />}
+      {isPartnerModalOpen && <PartnerAccessModal />}
+
+      {welcomeBackMessage && (
+        <WelcomeBack message={welcomeBackMessage} onDismiss={clearWelcomeBackMessage} />
+      )}
+    </div>
+  );
 };
 
-// The root component now simply sets up the context providers.
-// AppProvider must wrap UserProvider so AppUI can access both contexts
+/**
+ * App is the root component. It sets up providers and blocks UI until auth session is known.
+ * AppProvider must wrap UserProvider so AppUI can access both contexts.
+ */
 const App: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check the initial session state
-    supabase.auth.getSession()
+    let mounted = true;
+
+    supabase.auth
+      .getSession()
       .then(({ data: { session } }) => {
+        if (!mounted) return;
         setSession(session);
       })
       .catch((error) => {
-        console.error("Error fetching session:", error);
+        console.error('Error fetching session:', error);
       })
       .finally(() => {
+        if (!mounted) return;
         setLoading(false);
       });
 
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
       setSession(session);
-      // Once we get an auth event, we are no longer in the initial loading state.
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      data.subscription.unsubscribe();
+    };
   }, []);
 
-  if (loading) {
-      return <LoadingScreen />;
-  }
+  if (loading) return <LoadingScreen />;
+  if (!session) return <AuthFlow />;
 
-  if (!session) {
-    return <AuthFlow />;
-  }
-  
   return (
     <AppProvider>
-        <UserProvider>
-            <EntitlementProvider>
-                <ProactiveUpgradeProvider>
-                    <AppUI />
-                </ProactiveUpgradeProvider>
-            </EntitlementProvider>
-        </UserProvider>
+      <UserProvider>
+        <EntitlementProvider>
+          <ProactiveUpgradeProvider>
+            <AppUI />
+          </ProactiveUpgradeProvider>
+        </EntitlementProvider>
+      </UserProvider>
     </AppProvider>
   );
 };
