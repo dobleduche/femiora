@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { HomeIcon, SparkleIcon, ArrowRightIcon } from '../icons/Icons';
 import { useUser } from '../../contexts/UserContext';
 import { useApp } from '../../contexts/AppContext';
+import { buildOraSystemPrompt } from '../../utils/oraPrompt';
 
 interface ChatMessage {
   role: 'user' | 'model';
