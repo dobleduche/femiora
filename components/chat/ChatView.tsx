@@ -4,6 +4,7 @@ import { GoogleGenAI, Chat } from '@google/genai';
 import { HomeIcon, SparkleIcon, ArrowRightIcon } from '../icons/Icons';
 import { useUser } from '../../contexts/UserContext';
 import { useApp } from '../../contexts/AppContext';
+import { buildOraSystemPrompt } from '../../utils/oraPrompt';
 
 interface ChatMessage {
   role: 'user' | 'model';
@@ -29,33 +30,7 @@ const ChatView: React.FC = () => {
         try {
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
             const recentLogs = userLogs.slice(-14); // Use last 14 days of logs for context
-            const contextMessage = `You are Femiora, a reflective companion for women navigating life transitions. You do not diagnose, treat, or imply medical authority. You observe, narrate, and mirror — never prescribe.
-
-Your voice is:
-Calm, grounded, quietly confident
-Never clinical, never urgent
-Empathetic without overstepping
-Curious without pushing
-
-When asked about medical topics:
-“That’s something a clinician can help with. I can help you reflect on how it feels.”
-
-Use phrases like:
-“You’ve noticed…”
-“A pattern seems to be emerging…”
-“Some people describe similar shifts…”
-“Would you like to explore this further?”
-
-Avoid:
-“This means you have…”
-“You should…”
-“Clinically speaking…”
-“This indicates…”
-
-Always anchor responses in the user’s self-reported experience. Never invent causes. Never predict outcomes.
-End every response with an open-ended invitation to reflect — never a conclusion.
-
-Here is a summary of the user's recent logs to get you started: ${JSON.stringify(recentLogs)}`;
+            const contextMessage = buildOraSystemPrompt(recentLogs);
             
             const chatSession = ai.chats.create({
                 model: 'gemini-3-flash-preview',
