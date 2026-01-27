@@ -1,0 +1,35 @@
+# Femiora Code Owners
+# These owners will be requested for review when changes are made to matched paths.
+
+# Default owners for everything
+* @femiora/core-team
+
+# Frontend components
+/components/ @femiora/frontend-team
+/contexts/ @femiora/frontend-team
+/hooks/ @femiora/frontend-team
+
+# Backend/API
+/server/ @femiora/backend-team
+/api/ @femiora/backend-team
+
+# Database schema changes require senior review
+/db/ @femiora/core-team @femiora/backend-team
+
+# AI/Ora integration
+/server/ora/ @femiora/ai-team
+/server/routes/ora.ts @femiora/ai-team
+/utils/oraPrompt.ts @femiora/ai-team
+
+# Security-sensitive files
+/.env.example @femiora/security-team
+/server/auth/ @femiora/security-team
+SECURITY.md @femiora/security-team
+
+# CI/CD and infrastructure
+/.github/ @femiora/devops-team
+/ecosystem.config.js @femiora/devops-team
+
+# Documentation
+*.md @femiora/docs-team
+/README.md @femiora/core-team
