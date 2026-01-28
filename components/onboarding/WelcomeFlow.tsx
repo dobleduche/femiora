@@ -1,88 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import {
-  FeatherIcon,
-  LockIcon,
-  LeafIcon,
-  TrendingUpIcon,
-  DropletIcon,
-  MoonIcon,
-  TagIcon,
-  SparkleIcon,
-} from '../icons/Icons';
 import { useUser } from '../../contexts/UserContext';
-
-const intentOptions = [
-  { id: 'changes', label: "I'm noticing changes in how I feel" },
-  { id: 'rhythms', label: 'I want to understand my personal rhythms' },
-  { id: 'different', label: "I feel different lately — not sure why" },
-  { id: 'curious', label: "I'm just curious about my patterns" },
-  { id: 'returning', label: "I've been here before — back to reflect" },
-];
-
-const focusOptions = [
-  {
-    id: 'energy',
-    label: 'Energy levels throughout the day',
-    description: 'This helps Femiora surface patterns — never diagnose.',
-    icon: <TrendingUpIcon className="w-7 h-7" />,
-  },
-  {
-    id: 'mood',
-    label: 'Mood tone — light, heavy, calm, tense',
-    description: 'This helps Femiora surface patterns — never diagnose.',
-    icon: <FeatherIcon className="w-7 h-7" />,
-  },
-  {
-    id: 'sleep',
-    label: 'Sleep quality and restfulness',
-    description: 'This helps Femiora surface patterns — never diagnose.',
-    icon: <MoonIcon className="w-7 h-7" />,
-  },
-  {
-    id: 'focus',
-    label: 'Focus and mental clarity',
-    description: 'This helps Femiora surface patterns — never diagnose.',
-    icon: <SparkleIcon className="w-7 h-7" />,
-  },
-  {
-    id: 'temperature',
-    label: 'Body temperature sensations (warm, cool, flushed)',
-    description: 'This helps Femiora surface patterns — never diagnose.',
-    icon: <TagIcon className="w-7 h-7" />,
-  },
-  {
-    id: 'stress',
-    label: 'Stress pressure or ease',
-    description: 'This helps Femiora surface patterns — never diagnose.',
-    icon: <LockIcon className="w-7 h-7" />,
-  },
-  {
-    id: 'motivation',
-    label: 'Motivation — what moves you?',
-    description: 'This helps Femiora surface patterns — never diagnose.',
-    icon: <LeafIcon className="w-7 h-7" />,
-  },
-  {
-    id: 'appetite',
-    label: 'Appetite shifts — hunger, cravings, satisfaction',
-    description: 'This helps Femiora surface patterns — never diagnose.',
-    icon: <TagIcon className="w-7 h-7" />,
-  },
-  {
-    id: 'cycles',
-    label: 'Personal cadence — recurring phases in your rhythm',
-    description: 'This helps Femiora surface patterns — never diagnose.',
-    icon: <DropletIcon className="w-7 h-7" />,
-  },
-];
+import { trackEvent } from '../../utils/analytics';
 
 const WelcomeFlow: React.FC = () => {
   const [step, setStep] = useState(0);
   const [exiting, setExiting] = useState(false);
   const [isEntering, setIsEntering] = useState(true);
-  const [selectedIntent, setSelectedIntent] = useState('');
-  const [selectedFocusAreas, setSelectedFocusAreas] = useState<string[]>([]);
-  const { completeOnboarding, updateUser } = useUser();
+  const [selectedMode, setSelectedMode] = useState<'write' | 'observe' | ''>('');
+  const [entryText, setEntryText] = useState('');
+  const [showExitCta, setShowExitCta] = useState(false);
+  const { completeOnboarding, updateUser, saveLog } = useUser();
 
   useEffect(() => {
     setIsEntering(true);
@@ -92,45 +19,96 @@ const WelcomeFlow: React.FC = () => {
     return () => cancelAnimationFrame(timer);
   }, [step]);
 
-  const handleToggleFocusArea = (id: string) => {
-    setSelectedFocusAreas((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
-    );
-  };
+  useEffect(() => {
+    if (step === 0) trackEvent('onboarding_view_arrival');
+    if (step === 1) trackEvent('onboarding_view_reframe');
+    if (step === 3) trackEvent('onboarding_introduce_ora');
+  }, [step]);
+
+  useEffect(() => {
+    if (step === 5) {
+      setShowExitCta(false);
+      const timer = setTimeout(() => setShowExitCta(true), 500);
+      return () => clearTimeout(timer);
+    }
+    setShowExitCta(true);
+    return undefined;
+  }, [step]);
 
   const steps = [
     {
-      title: 'Why are you here?',
-      content: 'What brought you to Femiora today?',
+      id: 'arrival',
+      headline: 'You don’t have to track anything perfectly here.',
       cta: 'Continue',
-      isStepValid: selectedIntent.length > 0,
+      isStepValid: true,
     },
     {
-      title: 'What would you like to gently observe?',
-      content: 'You can adjust this anytime.',
+      id: 'reframe',
+      headline: (
+        <>
+          <span className="block">Femiora notices patterns over time.</span>
+          <span className="block">Even when you forget.</span>
+          <span className="block">Even when you’re not sure.</span>
+        </>
+      ),
       cta: 'Continue',
-      isStepValid: selectedFocusAreas.length > 0,
+      isStepValid: true,
     },
     {
-      title: 'Before we begin: Femiora is not medical advice.',
-      content:
-        "You’re here to reflect, not to be diagnosed. Your notes belong to you. Insights are observations — not prescriptions. If you ever need clinical support, we’ll gently guide you there.",
-      cta: 'I understand — let’s begin.',
+      id: 'agency',
+      headline: 'How do you want to be here today?',
+      cta: 'Continue',
+      isStepValid: selectedMode.length > 0,
+    },
+    {
+      id: 'ora',
+      headline: 'This is Ora.',
+      subtext: (
+        <>
+          <span className="block">She doesn’t correct you.</span>
+          <span className="block">She notices what returns.</span>
+        </>
+      ),
+      cta: 'Continue',
+      isStepValid: true,
+    },
+    {
+      id: 'first-entry',
+      headline: 'Anything you want to leave here today.',
+      cta: entryText.trim().length > 0 ? 'Leave it here' : 'Continue',
+      isStepValid: true,
+    },
+    {
+      id: 'exit',
+      headline: 'There’s nothing to keep up with.',
+      cta: 'Enter Femiora',
       isStepValid: true,
     },
   ];
 
+  const handleSelectMode = async (mode: 'write' | 'observe') => {
+    setSelectedMode(mode);
+    trackEvent('onboarding_preference_selected', { mode });
+    await updateUser({ settings: { onboardingIntent: mode } });
+  };
+
   const handleNext = async () => {
-    if (step === 0) {
-      await updateUser({ settings: { onboardingIntent: selectedIntent } });
-    }
-    if (step === 1) {
-      await updateUser({ settings: { focusAreas: selectedFocusAreas } });
+    if (step === 4) {
+      const trimmed = entryText.trim();
+      if (trimmed.length > 0) {
+        await saveLog({ note: trimmed });
+        const lengthBucket =
+          trimmed.length <= 50 ? 'short' : trimmed.length <= 200 ? 'medium' : 'long';
+        trackEvent('first_entry_created', { length_bucket: lengthBucket });
+      } else {
+        trackEvent('first_entry_skipped');
+      }
     }
 
     setExiting(true);
     setTimeout(() => {
       if (step === steps.length - 1) {
+        trackEvent('onboarding_complete');
         completeOnboarding();
       } else {
         setStep((prev) => prev + 1);
@@ -154,21 +132,32 @@ const WelcomeFlow: React.FC = () => {
           key={step}
           className={`text-center transition-all duration-400 ease-in-out ${animationClass}`}
         >
-          <h1 className="text-3xl font-serif text-gray-800 mb-4">
-            {currentStep.title}
+          <h1 className="text-2xl sm:text-3xl font-serif text-gray-800 mb-4">
+            {currentStep.headline}
           </h1>
-          <p className="text-lg text-gray-700 mb-8 leading-relaxed">
-            {currentStep.content}
-          </p>
+          {currentStep.subtext && (
+            <p className="text-base text-gray-600 mb-8 leading-relaxed">
+              {currentStep.subtext}
+            </p>
+          )}
 
-          {step === 0 && (
+          {step === 2 && (
             <div className="space-y-3 mb-8">
-              {intentOptions.map((option) => {
-                const isSelected = selectedIntent === option.id;
+              {[
+                {
+                  id: 'write',
+                  label: 'I want to write when something comes up.',
+                },
+                {
+                  id: 'observe',
+                  label: 'I just want to observe quietly for now.',
+                },
+              ].map((option) => {
+                const isSelected = selectedMode === option.id;
                 return (
                   <button
                     key={option.id}
-                    onClick={() => setSelectedIntent(option.id)}
+                    onClick={() => handleSelectMode(option.id as 'write' | 'observe')}
                     className={`w-full text-left px-5 py-4 rounded-2xl border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mist-blue ${
                       isSelected
                         ? 'border-calm-sage bg-white/70 shadow-soft'
@@ -184,56 +173,45 @@ const WelcomeFlow: React.FC = () => {
             </div>
           )}
 
-          {step === 1 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-              {focusOptions.map((option) => {
-                const isSelected = selectedFocusAreas.includes(option.id);
-                return (
-                  <button
-                    key={option.id}
-                    onClick={() => handleToggleFocusArea(option.id)}
-                    className={`flex flex-col items-start text-left p-4 rounded-2xl border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mist-blue ${
-                      isSelected
-                        ? 'border-calm-sage bg-white/80 shadow-soft'
-                        : 'border-white/60 bg-white/40 hover:border-white'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 mb-2 text-calm-sage">
-                      {option.icon}
-                      <span className="text-sm font-medium text-gray-800">
-                        {option.label}
-                      </span>
-                    </div>
-                    <span className="text-xs text-gray-600">
-                      {option.description}
-                    </span>
-                  </button>
-                );
-              })}
+          {step === 4 && (
+            <div className="mb-8">
+              <textarea
+                value={entryText}
+                onChange={(event) => setEntryText(event.target.value)}
+                className="w-full min-h-[140px] rounded-2xl border-2 border-white/70 bg-white/60 p-4 text-sm text-gray-800 shadow-soft focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mist-blue"
+              />
             </div>
           )}
 
-          <button
-            onClick={handleNext}
-            disabled={!currentStep.isStepValid}
-            className="w-full py-4 px-6 bg-calm-sage text-white rounded-full 
-                       hover:bg-opacity-90 transition-all transform hover:-translate-y-1
-                       shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mist-blue
-                       disabled:bg-gray-400 disabled:shadow-none disabled:transform-none disabled:cursor-not-allowed"
-          >
-            {currentStep.cta}
-          </button>
-        </div>
+          {step !== 5 && (
+            <button
+              onClick={handleNext}
+              disabled={!currentStep.isStepValid}
+              className="w-full py-4 px-6 bg-calm-sage text-white rounded-full 
+                         hover:bg-opacity-90 transition-all transform hover:-translate-y-1
+                         shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mist-blue
+                         disabled:bg-gray-400 disabled:shadow-none disabled:transform-none disabled:cursor-not-allowed"
+            >
+              {currentStep.cta}
+            </button>
+          )}
 
-        <div className="flex justify-center mt-12 space-x-2">
-          {steps.map((_, i) => (
-            <div
-              key={i}
-              className={`w-2 h-2 rounded-full transition-all duration-500 ${
-                i === step ? 'bg-calm-sage w-8' : 'bg-gray-300'
-              }`}
-            />
-          ))}
+          {step === 5 && (
+            <div className="min-h-[64px] flex items-center justify-center">
+              {showExitCta && (
+                <button
+                  onClick={handleNext}
+                  disabled={!currentStep.isStepValid}
+                  className="w-full py-4 px-6 bg-calm-sage text-white rounded-full 
+                             hover:bg-opacity-90 transition-all transform hover:-translate-y-1
+                             shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mist-blue
+                             disabled:bg-gray-400 disabled:shadow-none disabled:transform-none disabled:cursor-not-allowed"
+                >
+                  {currentStep.cta}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
