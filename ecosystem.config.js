@@ -1,26 +1,33 @@
 module.exports = {
-    apps: [
-      {
-        name: '68f0a225657e899e98d8ea52-server',
-        script: 'npm',
-        args: 'run dev',
-        cwd: './server',
-        instances: 1,
-        exec_mode: 'fork',
-        autorestart: true,
-        watch: true,
-        time: true
+  apps: [
+    {
+      name: 'femiora-api',
+      script: 'npm',
+      args: 'run server',
+      cwd: '.',
+      instances: 1,
+      exec_mode: 'fork',
+      autorestart: true,
+      watch: false,
+      time: true,
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3001,
       },
-      {
-        name: '68f0a225657e899e98d8ea52-client',
-        script: 'npm',
-        args: 'start',
-        cwd: './client',
-        instances: 1,
-        exec_mode: 'fork',
-        autorestart: true,
-        watch: false,
-        time: true
-      }
-    ]
-  };
+    },
+    {
+      name: 'femiora-web',
+      script: 'npm',
+      args: 'run preview -- --host 0.0.0.0 --port 3000',
+      cwd: '.',
+      instances: 1,
+      exec_mode: 'fork',
+      autorestart: true,
+      watch: false,
+      time: true,
+      env: {
+        NODE_ENV: 'production',
+      },
+    },
+  ],
+};
