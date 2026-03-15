@@ -1,7 +1,7 @@
 
 import { db, getUserId, supabase } from '../lib/db';
 import * as schema from '../db/schema';
-import { eq, and, desc } from 'drizzle-orm/sql';
+import { eq, and, desc } from 'drizzle-orm';
 import type { UserSettings } from '../db/schema';
 
 // --- Canonical Data Models & Types ---
